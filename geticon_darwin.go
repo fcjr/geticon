@@ -34,6 +34,10 @@ import (
 	"golang.org/x/image/tiff"
 )
 
+// FromPid returns the app icon of the app currently running
+// on the given pid, if it has one.
+// This function will fail if the given PID does not have an
+// icon associated with it.
 func FromPid(pid uint32) (image.Image, error) {
 	// TODO don't allocate all this space
 	var imgBuf [1 << 28]byte
