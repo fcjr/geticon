@@ -10,9 +10,9 @@ icon, err := geticon.FromPid(pid) // returns an image.Image
 
 ## Todos
 
-[x] macOS support
-[ ] windows support
-[ ] memory improvement for macOS (don't allocate an extra large buffer)
-[ ] test
-[ ] benchmarks
-[ ] linux support?
+* [x] macOS support
+* [ ] windows support
+* [ ] memory improvement for macOS (don't allocate an extra large buffer)
+* [ ] test
+* [ ] benchmarks
+* [ ] linux support?
