@@ -3,10 +3,12 @@ package geticon
 /*
 #cgo CFLAGS: -x objective-c
 #cgo LDFLAGS: -framework CoreFoundation -framework Foundation -framework AppKit
+
 #import <stdlib.h>
 #import <Foundation/Foundation.h>
 #import <AppKit/NSImage.h>
 #import <AppKit/NSRunningApplication.h>
+
 int getIcon(void* imgBuf, pid_t pid) {
 	NSRunningApplication * app = [NSRunningApplication runningApplicationWithProcessIdentifier:pid];
 	if (app == nil) {
