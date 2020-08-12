@@ -49,7 +49,20 @@ func FromPid(pid uint32) (image.Image, error) {
 	if errCode != 0 {
 		return nil, fmt.Errorf("failed to gather icon")
 	}
-	tmpData := (*[1 << 28]byte)(imgPntr)[:imgLen:imgLen]
+
+	// support arbitrary len slices
+	// see https://github.com/crawshaw/sqlite/issues/45
+	slice := struct {
+		data unsafe.Pointer
+		len  int
+		cap  int
+	}{
+		data: imgPntr,
+		len:  imgLen,
+		cap:  imgLen,
+	}
+	tmpData := *(*[]byte)(unsafe.Pointer(&slice))
+
 	img, err := tiff.Decode(bytes.NewReader(tmpData))
 	if err != nil {
 		return nil, err
