@@ -9,8 +9,6 @@ package geticon
 #import <AppKit/NSImage.h>
 #import <AppKit/NSRunningApplication.h>
 
-typedef int* pInt;
-
 int getIcon(pid_t pid, void **img, int *imglen) {
 	NSRunningApplication * app = [NSRunningApplication runningApplicationWithProcessIdentifier:pid];
 	if (app == nil) {
@@ -18,13 +16,17 @@ int getIcon(pid_t pid, void **img, int *imglen) {
 	}
 	NSImage *appIcon = [app icon];
 	if (appIcon == nil) {
+		[app release];
 		return 1;
 	}
 	NSData *tiffData = [appIcon TIFFRepresentation];
+	[app release];
+	[appIcon release];
 
 	*imglen = (int) [tiffData length];
 	*img = malloc(*imglen);
 	memcpy(*img, [tiffData bytes], *imglen);
+	[tiffData release];
 	return 0;
 }
 */
@@ -43,9 +45,9 @@ import (
 // This function will fail if the given PID does not have an
 // icon associated with it.
 func FromPid(pid uint32) (image.Image, error) {
-	var imgLen int
+	var imgLen C.int
 	var imgPntr unsafe.Pointer
-	errCode := C.getIcon(C.pid_t(pid), &imgPntr, (C.pInt)(unsafe.Pointer(&imgLen)))
+	errCode := C.getIcon(C.pid_t(pid), &imgPntr, &imgLen)
 	if errCode != 0 {
 		return nil, fmt.Errorf("failed to gather icon")
 	}
@@ -59,8 +61,8 @@ func FromPid(pid uint32) (image.Image, error) {
 		cap  int
 	}{
 		data: imgPntr,
-		len:  imgLen,
-		cap:  imgLen,
+		len:  int(imgLen),
+		cap:  int(imgLen),
 	}
 	tmpData := *(*[]byte)(unsafe.Pointer(&slice))
 
