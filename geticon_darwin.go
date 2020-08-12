@@ -9,21 +9,23 @@ package geticon
 #import <AppKit/NSImage.h>
 #import <AppKit/NSRunningApplication.h>
 
-int getIcon(void* imgBuf, pid_t pid) {
+typedef int* pInt;
+
+int getIcon(pid_t pid, void **img, int *imglen) {
 	NSRunningApplication * app = [NSRunningApplication runningApplicationWithProcessIdentifier:pid];
 	if (app == nil) {
-		return -1;
+		return 1;
 	}
 	NSImage *appIcon = [app icon];
 	if (appIcon == nil) {
-		return -1;
+		return 1;
 	}
 	NSData *tiffData = [appIcon TIFFRepresentation];
-	if ([tiffData length] > (1 << 28)){
-		return -1;
-	}
-	memcpy(imgBuf, [tiffData bytes], [tiffData length]);
-	return [tiffData length];
+
+	*imglen = (int) [tiffData length];
+	*img = malloc(*imglen);
+	memcpy(*img, [tiffData bytes], *imglen);
+	return 0;
 }
 */
 import "C"
@@ -41,16 +43,17 @@ import (
 // This function will fail if the given PID does not have an
 // icon associated with it.
 func FromPid(pid uint32) (image.Image, error) {
-	// TODO don't allocate all this space
-	var imgBuf [1 << 28]byte
-	length := C.getIcon(unsafe.Pointer(&imgBuf[0]), C.pid_t(pid))
-	if length < 0 {
+	var imgLen int
+	var imgPntr unsafe.Pointer
+	errCode := C.getIcon(C.pid_t(pid), &imgPntr, (C.pInt)(unsafe.Pointer(&imgLen)))
+	if errCode != 0 {
 		return nil, fmt.Errorf("failed to gather icon")
 	}
-	tmpData := imgBuf[0:length]
+	tmpData := (*[1 << 28]byte)(imgPntr)[:imgLen:imgLen]
 	img, err := tiff.Decode(bytes.NewReader(tmpData))
 	if err != nil {
 		return nil, err
 	}
+	C.free(imgPntr)
 	return img, nil
 }
