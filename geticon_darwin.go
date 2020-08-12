@@ -49,6 +49,7 @@ func FromPid(pid uint32) (image.Image, error) {
 	if errCode != 0 {
 		return nil, fmt.Errorf("failed to gather icon")
 	}
+	defer C.free(imgPntr)
 
 	// support arbitrary len slices
 	// see https://github.com/crawshaw/sqlite/issues/45
@@ -67,6 +68,5 @@ func FromPid(pid uint32) (image.Image, error) {
 	if err != nil {
 		return nil, err
 	}
-	C.free(imgPntr)
 	return img, nil
 }
