@@ -2,10 +2,9 @@ package geticon
 
 /*
 #cgo CFLAGS: -x objective-c
-#cgo LDFLAGS: -framework CoreFoundation -framework Foundation -framework AppKit
+#cgo LDFLAGS: -framework AppKit
 
 #import <stdlib.h>
-#import <Foundation/Foundation.h>
 #import <AppKit/NSImage.h>
 #import <AppKit/NSRunningApplication.h>
 
