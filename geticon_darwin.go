@@ -25,6 +25,10 @@ int getIcon(pid_t pid, void **img, int *imglen) {
 
 	*imglen = (int) [tiffData length];
 	*img = malloc(*imglen);
+	if (*img == NULL) {
+		[tiffData release];
+		return 1;
+	}
 	memcpy(*img, [tiffData bytes], *imglen);
 	[tiffData release];
 	return 0;
@@ -64,9 +68,9 @@ func FromPid(pid uint32) (image.Image, error) {
 		len:  int(imgLen),
 		cap:  int(imgLen),
 	}
-	tmpData := *(*[]byte)(unsafe.Pointer(&slice))
+	imgData := *(*[]byte)(unsafe.Pointer(&slice))
 
-	img, err := tiff.Decode(bytes.NewReader(tmpData))
+	img, err := tiff.Decode(bytes.NewReader(imgData))
 	if err != nil {
 		return nil, err
 	}
