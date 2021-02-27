@@ -1,16 +1,16 @@
-# geticon-go
+# geticon
 
 A tiny cGo library to get app icons of running applications.
 
 ## Installation
 
-    go get github.com/fcjr/geticon-go
+    go get github.com/fcjr/geticon
 
 ## Usage
 
 ```go
 import (
-    "github.com/fcjr/geticon-go"
+    "github.com/fcjr/geticon"
 )
 
 icon, err := geticon.FromPid(pid) // returns an image.Image

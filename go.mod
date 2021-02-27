@@ -1,4 +1,4 @@
-module github.com/fcjr/geticon-go
+module github.com/fcjr/geticon
 
 go 1.14
 
