@@ -20,7 +20,7 @@ icon, err := geticon.FromPid(pid) // returns an image.Image
 
 On mac the image.Image returned should alwasy be tiff encoded.
 
-On windows the image.Image return will be the largest available image from the apps
+On windows the image.Image returned will be the largest available image from the apps
 ico set.  This can either be a PNG or a BMP.
 
 ## Todos
