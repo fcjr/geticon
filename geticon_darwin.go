@@ -56,19 +56,7 @@ func FromPid(pid uint32) (image.Image, error) {
 	}
 	defer C.free(imgPntr)
 
-	// support arbitrary len slices
-	// see https://github.com/crawshaw/sqlite/issues/45
-	slice := struct {
-		data unsafe.Pointer
-		len  int
-		cap  int
-	}{
-		data: imgPntr,
-		len:  int(imgLen),
-		cap:  int(imgLen),
-	}
-	imgData := *(*[]byte)(unsafe.Pointer(&slice))
-
+	imgData := cToGoSlice(imgPntr, imgLen)
 	img, err := tiff.Decode(bytes.NewReader(imgData))
 	if err != nil {
 		return nil, err

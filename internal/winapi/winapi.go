@@ -2,6 +2,7 @@ package winapi
 
 import (
 	"fmt"
+	"syscall"
 	"unsafe"
 
 	"golang.org/x/sys/windows"
@@ -10,8 +11,12 @@ import (
 var (
 	kernel32                   = windows.NewLazyDLL("kernel32.dll")
 	queryFullProcessImageNameW = kernel32.NewProc("QueryFullProcessImageNameW")
-	loadLibraryEx              = kernel32.NewProc("LoadLibraryExW")
+	loadLibraryExW             = kernel32.NewProc("LoadLibraryExW")
 	enumResourceNamesA         = kernel32.NewProc("EnumResourceNamesA")
+	findResourceA              = kernel32.NewProc("FindResourceA")
+	sizeofResource             = kernel32.NewProc("SizeofResource")
+	loadResource               = kernel32.NewProc("LoadResource")
+	lockResource               = kernel32.NewProc("LockResource")
 )
 
 const (
@@ -25,7 +30,7 @@ const (
 )
 
 type (
-	LPEnumFunc func(hModule uintptr, lpType string, lpName string, wLanguage uint16, lParam *int) bool
+	ENUMRESNAMEPROCA func(hModule windows.Handle, lpType, lpName, lParam uintptr) uintptr
 )
 
 func QueryFullProcessImageName(pid uint32, flags uint32) (s string, err error) {
@@ -54,7 +59,7 @@ func QueryFullProcessImageName(pid uint32, flags uint32) (s string, err error) {
 }
 
 func LoadLibraryEx(name string, flags uint32) (windows.Handle, error) {
-	if err := loadLibraryEx.Find(); err != nil {
+	if err := loadLibraryExW.Find(); err != nil {
 		return 0, err
 	}
 
@@ -63,7 +68,7 @@ func LoadLibraryEx(name string, flags uint32) (windows.Handle, error) {
 	if err != nil {
 		return 0, err
 	}
-	r1, _, e1 := loadLibraryEx.Call(
+	r1, _, e1 := loadLibraryExW.Call(
 		uintptr(unsafe.Pointer(namePtr)),
 		0,
 		uintptr(flags),
@@ -76,25 +81,88 @@ func LoadLibraryEx(name string, flags uint32) (windows.Handle, error) {
 		}
 	}
 	return handle, nil
-
 }
 
-func MakeIntResource(id uint16) *uint16 {
-	return (*uint16)(unsafe.Pointer(uintptr(id)))
+func MakeIntResource(id uintptr) *uint16 {
+	return (*uint16)(unsafe.Pointer(id))
 }
 
-func EnumResourceNamesA(hModule windows.Handle, lpcStr *uint16, lpEnumFunc LPEnumFunc, lParam *int32) error {
+func IsIntResource(id uintptr) bool {
+	return *(*uint16)(unsafe.Pointer(id))<<16 == 0
+}
+
+func EnumResourceNames(hModule windows.Handle, lpcStr *uint16, lpEnumFunc ENUMRESNAMEPROCA, lParam *int32) error {
 	if err := enumResourceNamesA.Find(); err != nil {
 		return err
 	}
 	r1, _, e1 := enumResourceNamesA.Call(
 		uintptr(hModule),
-		uintptr(unsafe.Pointer(&lpcStr)),
-		uintptr(unsafe.Pointer(&lpEnumFunc)),
-		uintptr(unsafe.Pointer(&lParam)),
+		uintptr(unsafe.Pointer(lpcStr)),
+		syscall.NewCallback(lpEnumFunc),
+		uintptr(unsafe.Pointer(lParam)),
 	)
 	if r1 != 0 {
 		return windows.Errno(r1)
 	}
 	return e1
+}
+
+func FindResource(hModule windows.Handle, lpName, lpType uintptr) (rInfo uintptr, err error) {
+	if err := findResourceA.Find(); err != nil {
+		return 0, err
+	}
+	r1, _, e1 := findResourceA.Call(
+		uintptr(hModule),
+		lpName,
+		lpType,
+	)
+	if r1 == 0 {
+		if e1 != nil {
+			return 0, err
+		} else {
+			return 0, fmt.Errorf("couldn't find resource")
+		}
+	}
+	return r1, nil
+}
+
+func SizeofResource(hModule windows.Handle, hResInfo uintptr) (uint32, error) {
+	if err := sizeofResource.Find(); err != nil {
+		return 0, err
+	}
+	r1, _, e1 := sizeofResource.Call(
+		uintptr(hModule),
+		hResInfo,
+	)
+	if e1 == windows.Errno(0) {
+		return uint32(r1), nil
+	}
+	return 0, e1
+}
+
+func LoadResource(hModule windows.Handle, hResInfo uintptr) (windows.Handle, error) {
+	if err := loadResource.Find(); err != nil {
+		return 0, err
+	}
+	r1, _, e1 := loadResource.Call(
+		uintptr(hModule),
+		hResInfo,
+	)
+	if e1 == windows.Errno(0) {
+		return windows.Handle(r1), nil
+	}
+	return 0, e1
+}
+
+func LockResource(hResData windows.Handle) (windows.Handle, error) {
+	if err := lockResource.Find(); err != nil {
+		return 0, err
+	}
+
+	r1, _, _ := lockResource.Call(
+		uintptr(hResData),
+		0,
+		0)
+
+	return windows.Handle(r1), nil
 }
