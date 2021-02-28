@@ -4,7 +4,9 @@ A tiny cross-plaform (macOS + windows) slibrary to get app icons of running appl
 
 ## Installation
 
-    go get github.com/fcjr/geticon
+```sh
+go get github.com/fcjr/geticon
+```
 
 ## Usage
 
