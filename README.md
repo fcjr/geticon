@@ -2,7 +2,7 @@
 
 [![GoDoc][doc-img]][doc] [![Go Report Card][report-card-img]][report-card]
 
-A tiny library to get app icons of other applications.
+A tiny cross-plaform (macOS + windows) library to get app icons of other applications.
 
 ## Installation
 
@@ -24,10 +24,17 @@ icon, err := geticon.FromPid(pid) // returns an image.Image
 icon, err := geticon.FromPath(path) // returns an image.Image
 ```
 
+## Technical Details
+
+On mac the image.Image returned should alwasy be tiff encoded.
+
+On windows the image.Image returned will be the largest available image from the apps
+ico set.  This can either be a PNG or a BMP.
+
 ## Todos
 
 * [x] macOS support
-* [ ] windows support
+* [x] windows support
 * [ ] test
 * [ ] benchmarks
 * [ ] linux support?
