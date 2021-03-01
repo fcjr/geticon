@@ -80,7 +80,7 @@ func FromPath(exePath string) (image.Image, error) {
 	// get handle
 	exeHandle, err := winapi.LoadLibraryEx(
 		exePath,
-		winapi.LOAD_LIBRARY_AS_IMAGE_RESOURCE|winapi.LOAD_LIBRARY_AS_DATAFILE,
+		winapi.LoadLibraryAsImageResource|winapi.LoadLibraryAsDatafile,
 	)
 	if err != nil {
 		return nil, err
@@ -92,7 +92,7 @@ func FromPath(exePath string) (image.Image, error) {
 	// enum rt_group_icons and grab the first one
 	err = winapi.EnumResourceNames(
 		exeHandle,
-		winapi.MakeIntResource(winapi.RT_GROUP_ICON),
+		winapi.MakeIntResource(winapi.RtGroupIcon),
 		func(hModule windows.Handle, lpType, lpName, lParam uintptr) uintptr {
 
 			resPtr, _, err := getResource(hModule, lpType, lpName)
@@ -125,7 +125,7 @@ func FromPath(exePath string) (image.Image, error) {
 			}
 
 			// get best image
-			bestPtr, bestLen, err := getResource(hModule, winapi.RT_ICON, uintptr(bestEntry.NID))
+			bestPtr, bestLen, err := getResource(hModule, winapi.RtIcon, uintptr(bestEntry.NID))
 			if err != nil {
 				innerErr = err
 				return uintptr(0)
@@ -207,7 +207,7 @@ func FromPath(exePath string) (image.Image, error) {
 
 // https://devblogs.microsoft.com/oldnewthing/20120720-00/?p=7083 algo at the end of the article
 func getResource(hModule windows.Handle, lpType, lpName uintptr) (resPtr uintptr, resLen uint32, err error) {
-	rInfo, err := winapi.FindResource(hModule, lpName, lpType)
+	rInfo, err := winapi.FindResourceA(hModule, lpName, lpType)
 	if err != nil {
 		return 0, 0, err
 	}
@@ -252,7 +252,7 @@ func getCompleteIcoFromPath(exePath string) ([]byte, error) {
 	// get handle
 	exeHandle, err := winapi.LoadLibraryEx(
 		exePath,
-		winapi.LOAD_LIBRARY_AS_IMAGE_RESOURCE|winapi.LOAD_LIBRARY_AS_DATAFILE,
+		winapi.LoadLibraryAsImageResource|winapi.LoadLibraryAsDatafile,
 	)
 	if err != nil {
 		return nil, err
@@ -264,9 +264,9 @@ func getCompleteIcoFromPath(exePath string) ([]byte, error) {
 
 	var innerErr error
 	// enum rt_group_icons and grab the first one
-	err = winapi.EnumResourceNames(
+	err = winapi.EnumResourceNamesA(
 		exeHandle,
-		winapi.MakeIntResource(winapi.RT_GROUP_ICON),
+		winapi.MakeIntResource(winapi.RtGroupIcon),
 		func(hModule windows.Handle, lpType, lpName, lParam uintptr) uintptr {
 
 			resPtr, _, err := getResource(hModule, lpType, lpName)
@@ -295,7 +295,7 @@ func getCompleteIcoFromPath(exePath string) ([]byte, error) {
 				// fmt.Printf("%+v\n", entry)
 				imgPntr, imgLen, err := getResource(
 					hModule,
-					winapi.RT_ICON,
+					winapi.RtIcon,
 					uintptr(entry.NID),
 				)
 				if err != nil {
