@@ -66,7 +66,7 @@ type bitmapFileHeader struct {
 // on the given pid.
 func FromPid(pid uint32) (image.Image, error) {
 	// get path from pid
-	exePath, err := winapi.QueryFullProcessImageName(pid, 0)
+	exePath, err := winapi.QueryFullProcessImageNameW(pid, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +90,7 @@ func FromPath(exePath string) (image.Image, error) {
 	var img image.Image
 	var innerErr error
 	// enum rt_group_icons and grab the first one
-	err = winapi.EnumResourceNames(
+	err = winapi.EnumResourceNamesA(
 		exeHandle,
 		winapi.MakeIntResource(winapi.RtGroupIcon),
 		func(hModule windows.Handle, lpType, lpName, lParam uintptr) uintptr {
