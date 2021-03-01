@@ -59,7 +59,7 @@ import (
 	"golang.org/x/image/tiff"
 )
 
-// FromPath returns the app icon app at the specified path
+// FromPath returns the app icon app at the specified path.
 func FromPath(appPath string) (image.Image, error) {
 	var imgLen C.int
 	var imgPntr unsafe.Pointer
