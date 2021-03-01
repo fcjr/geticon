@@ -1,6 +1,6 @@
 # geticon
 
-A tiny cross-plaform (macOS + windows) slibrary to get app icons of running applications.
+A tiny cross-plaform (macOS + windows) library to get app icons of other applications.
 
 ## Installation
 
@@ -15,7 +15,11 @@ import (
     "github.com/fcjr/geticon"
 )
 
+// get icon of a running application by PID
 icon, err := geticon.FromPid(pid) // returns an image.Image
+
+// get icon of an application by path
+icon, err := geticon.FromPath(path) // returns an image.Image
 ```
 
 ## Technical Details

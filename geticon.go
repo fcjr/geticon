@@ -2,7 +2,7 @@ package geticon
 
 import "unsafe"
 
-func cToGoSlice(ptr unsafe.Pointer, len int) []byte {
+func cToGoSlice(cPtr unsafe.Pointer, cLen int) []byte {
 	// support arbitrary len slices
 	// see https://github.com/crawshaw/sqlite/issues/45
 	slice := struct {
@@ -10,9 +10,9 @@ func cToGoSlice(ptr unsafe.Pointer, len int) []byte {
 		len  int
 		cap  int
 	}{
-		data: ptr,
-		len:  int(len),
-		cap:  int(len),
+		data: cPtr,
+		len:  cLen,
+		cap:  cLen,
 	}
 	return *(*[]byte)(unsafe.Pointer(&slice))
 }
