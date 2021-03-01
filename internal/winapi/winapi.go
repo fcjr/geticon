@@ -153,9 +153,8 @@ func FindResourceA(hModule windows.Handle, lpName, lpType uintptr) (rInfo uintpt
 	if r1 == 0 {
 		if e1 != nil {
 			return 0, err
-		} else {
-			return 0, fmt.Errorf("couldn't find resource")
 		}
+		return 0, fmt.Errorf("couldn't find resource")
 	}
 	return r1, nil
 }
