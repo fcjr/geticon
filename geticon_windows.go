@@ -146,19 +146,19 @@ func FromPath(exePath string) (image.Image, error) {
 				img, innerErr = png.Decode(bytes.NewBuffer(imgData))
 				return uintptr(0)
 			}
-			// if not png then it must be a bitmap
 
+			// if not png then it must be a bitmap
 			// ico just contains the raw bitmap data so
 			// to encode it with the standard library we must
 			// create a file header
 
+			// cut the InfoHeader from imgData and build
+			// our own b/c for some reason its not working
+			// TODO figure this out
 			if len(imgData) < 40 {
 				innerErr = fmt.Errorf("invalid bitmap data")
 				return uintptr(0)
 			}
-			// cut the InfoHeader from imgData and build
-			// our own b/c for some reason its not working
-			// TODO figure this out
 			imgData = imgData[40:]
 
 			var dataOffset uint32
