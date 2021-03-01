@@ -189,19 +189,29 @@ func getResource(hModule windows.Handle, lpType, lpName uintptr) (resPtr uintptr
 	}
 
 	resSize, err := winapi.SizeofResource(hModule, rInfo)
-	if err != nil || resSize == 0 {
+	if err != nil {
+		return 0, 0, err
+	}
+	if resSize == 0 {
 		return 0, 0, fmt.Errorf("zero size resource")
 	}
 
 	res, err := winapi.LoadResource(hModule, rInfo)
-	if err != nil || res == 0 {
+	if err != nil {
+		return 0, 0, err
+	}
+	if res == 0 {
 		return 0, 0, fmt.Errorf("couldn't load resource")
 	}
 
 	lockedRes, err := winapi.LockResource(res)
-	if err != nil || res == 0 {
+	if err != nil {
+		return 0, 0, err
+	}
+	if res == 0 {
 		return 0, 0, fmt.Errorf("couldn't lock resource")
 	}
+
 	return uintptr(lockedRes), resSize, nil
 }
 
