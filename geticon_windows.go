@@ -41,15 +41,19 @@ type iconDirectoryEntry struct {
 }
 
 // FromPid returns the app icon of the app currently running
-// on the given pid, if it has one.
-// This function will fail if the given PID does not have an
-// icon associated with it.
+// on the given pid.
 func FromPid(pid uint32) (image.Image, error) {
 	// get path from pid
 	exePath, err := winapi.QueryFullProcessImageName(pid, 0)
 	if err != nil {
 		return nil, err
 	}
+
+	return FromPath(exePath)
+}
+
+// FromPath returns the app icon app at the specified path
+func FromPath(exePath string) (image.Image, error) {
 
 	// get handle
 	exeHandle, err := winapi.LoadLibraryEx(
