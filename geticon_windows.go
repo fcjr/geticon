@@ -247,7 +247,7 @@ func isPNG(b []byte) bool {
 }
 
 // extracts complete ico from from exe at exePath this was
-// previously used for this library but is not just here for reference
+// previously used for this library but is now just here for reference
 func getCompleteIcoFromPath(exePath string) ([]byte, error) {
 	// get handle
 	exeHandle, err := winapi.LoadLibraryEx(
