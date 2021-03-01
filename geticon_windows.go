@@ -52,7 +52,7 @@ func FromPid(pid uint32) (image.Image, error) {
 	return FromPath(exePath)
 }
 
-// FromPath returns the app icon app at the specified path
+// FromPath returns the app icon app at the specified path.
 func FromPath(exePath string) (image.Image, error) {
 
 	// get handle
