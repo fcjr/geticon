@@ -191,9 +191,9 @@ func FromPath(exePath string) (image.Image, error) {
 			// 1 = monochrome palette or
 			// 4 = 4bit palletized
 			img, innerErr = bmp.Decode(bytes.NewBuffer(imgData))
-			if innerErr != nil {
-				fmt.Println(innerErr)
-			}
+			// if innerErr != nil {
+			// 	fmt.Println(innerErr)
+			// }
 			return uintptr(0)
 		},
 		nil,
