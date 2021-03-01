@@ -109,7 +109,7 @@ func LoadLibraryEx(name string, flags uint32) (windows.Handle, error) {
 		if e1 != nil {
 			return 0, e1
 		}
-		return nil, fmt.Errorf("library not found")
+		return 0, fmt.Errorf("library not found")
 	}
 	return handle, nil
 }
