@@ -40,7 +40,6 @@ int getIconFromPid(pid_t pid, void **img, int *imglen) {
 
 int getIconFromPath(char* path, void** img, int *imglen) {
 	NSString *bundlePath = [NSString stringWithUTF8String:path];
-	printf("%s\n", [bundlePath UTF8String]);
 	NSImage *appIcon = [[NSWorkspace sharedWorkspace] iconForFile:bundlePath];
 	if (appIcon == nil) {
 		return 1;
