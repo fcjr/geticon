@@ -116,21 +116,21 @@ func LoadLibraryEx(name string, flags uint32) (windows.Handle, error) {
 
 // MakeIntResource converts an integer value to a resource type compatible with the resource-management functions.
 // This macro is used in place of a string containing the name of the resource.
-func MakeIntResource(id uintptr) *uint16 {
-	return (*uint16)(unsafe.Pointer(id))
+func MakeIntResource(i int) uintptr {
+	return uintptr(uint16(i))
 }
 
 // EnumResourceNamesA enumerates resources of a specified type within a binary module. For Windows Vista and later,
 // this is typically a language-neutral Portable Executable (LN file), and the enumeration will also include resources
 // from the corresponding language-specific resource files (.mui files) that contain localizable language resources.
 // It is also possible for hModule to specify an .mui file, in which case only that file is searched for resources.
-func EnumResourceNamesA(hModule windows.Handle, lpcStr *uint16, lpEnumFunc EnumResNameProcA, lParam *int32) error {
+func EnumResourceNamesA(hModule windows.Handle, lpcStr uintptr, lpEnumFunc EnumResNameProcA, lParam *int32) error {
 	if err := enumResourceNamesA.Find(); err != nil {
 		return err
 	}
 	r1, _, e1 := enumResourceNamesA.Call(
 		uintptr(hModule),
-		uintptr(unsafe.Pointer(lpcStr)),
+		lpcStr,
 		windows.NewCallback(lpEnumFunc),
 		uintptr(unsafe.Pointer(lParam)),
 	)
