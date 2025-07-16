@@ -168,13 +168,23 @@ func FromPath(exePath string) (image.Image, error) {
 				dataOffset = 14 + 40 + 4*uint32(bestEntry.BColorCount)
 			}
 
+			// https://en.wikipedia.org/wiki/ICO_(file_format)#cite_note-bigSize-7
+			var bmpWidth uint32 = uint32(bestEntry.BWidth)
+			if bmpWidth == 0 {
+				bmpWidth = 256
+			}
+			var bmpHeight uint32 = uint32(bestEntry.BHeight)
+			if bmpHeight == 0 {
+				bmpHeight = 256
+			}
+
 			bmpHeader := &bitmapFileHeader{
 				Signature:    [2]byte{'B', 'M'},
 				FileSize:     14 + 40 + uint32(len(imgData)),
 				DataOffset:   dataOffset,
 				Size:         40,
-				Width:        uint32(bestEntry.BWidth),
-				Height:       uint32(bestEntry.BHeight),
+				Width:        bmpWidth,
+				Height:       bmpHeight,
 				Planes:       bestEntry.WPlanes,
 				BitsPerPixel: bestEntry.WBitCount,
 				ColorsUsed:   uint32(bestEntry.BColorCount),
