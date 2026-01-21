@@ -1,3 +1,6 @@
+//go:build windows
+// +build windows
+
 package geticon
 
 import (
@@ -12,8 +15,6 @@ import (
 	"golang.org/x/image/bmp"
 	"golang.org/x/sys/windows"
 )
-
-const pngHeader = "\x89PNG\r\n\x1a\n"
 
 // https://devblogs.microsoft.com/oldnewthing/20120720-00/?p=7083
 
@@ -250,10 +251,6 @@ func getResource(hModule windows.Handle, lpType, lpName uintptr) (resPtr uintptr
 	}
 
 	return uintptr(lockedRes), resSize, nil
-}
-
-func isPNG(b []byte) bool {
-	return len(b) >= 8 && string(b[0:8]) == pngHeader
 }
 
 func encodeToBytes(i interface{}) ([]byte, error) {
